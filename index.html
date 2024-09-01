@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Stopwatch</title>
+</head>
+<body>
+    <h1>Simple Stopwatch</h1>
+    <p id="timer">00:00:00</p>
+    <button id="start">Start</button>
+    <button id="stop">Stop</button>
+    <button id="reset">Reset</button>
+    <button id="lap">Lap</button>
+
+    <ul id="laps"></ul>
+
+    <script>
+        let timerInterval;
+        let startTime;
+        let elapsedTime = 0;
+        let isRunning = false;
+
+        const timerDisplay = document.getElementById('timer');
+        const startButton = document.getElementById('start');
+        const stopButton = document.getElementById('stop');
+        const resetButton = document.getElementById('reset');
+        const lapButton = document.getElementById('lap');
+        const lapsList = document.getElementById('laps');
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const milliseconds = Math.floor(ms % 1000 / 10);
+
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
+        }
+
+        function updateTimer() {
+            const now = Date.now();
+            elapsedTime += now - startTime;
+            startTime = now;
+            timerDisplay.textContent = formatTime(elapsedTime);
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 10);
+                isRunning = true;
+            }
+        }
+
+        function stopTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            elapsedTime = 0;
+            timerDisplay.textContent = formatTime(elapsedTime);
+            lapsList.innerHTML = '';
+        }
+
+        function recordLap() {
+            if (isRunning) {
+                const lapTime = formatTime(elapsedTime);
+                const lapItem = document.createElement('li');
+                lapItem.textContent = lapTime;
+                lapsList.appendChild(lapItem);
+            }
+        }
+
+        startButton.addEventListener('click', startTimer);
+        stopButton.addEventListener('click', stopTimer);
+        resetButton.addEventListener('click', resetTimer);
+        lapButton.addEventListener('click', recordLap);
+    </script>
+</body>
+</html>
